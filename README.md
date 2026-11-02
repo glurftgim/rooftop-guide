@@ -4,7 +4,7 @@ Shows you the next obstacle on rooftop agility courses, with a crossing timer, m
 box. A transparent mode darkens the game and lets a video show through, so rooftops can be run AFK while you watch
 something else. It only draws on screen: it never clicks or moves for you.
 
-![Rooftop Guide on the Ardougne course: the obstacle in progress outlined in orange, the next one in cyan, the timer bar filling at the top and the session box in the corner](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/main.jpg)
+![Rooftop Guide on the Ardougne course, with numbered markers for the timer bar (1), the obstacle in progress (2), the upcoming obstacle (3) and the session box (4), and a legend of the highlight colors](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/main.jpg)
 
 ## Features
 
