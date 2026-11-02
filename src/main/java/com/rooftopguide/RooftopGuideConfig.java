@@ -61,7 +61,7 @@ public interface RooftopGuideConfig extends Config
 		description = "How opaque the window is while transparent mode is on, in percent. Lower is more see-through. "
 			+ "Changes apply right away while transparent mode is on",
 		section = focusSection,
-		position = 4
+		position = 3
 	)
 	default int transparentOpacity()
 	{
@@ -74,7 +74,7 @@ public interface RooftopGuideConfig extends Config
 		description = "Also cover the game interface (inventory, chat, minimap), and ignore clicks on it so they can't be "
 			+ "hit by accident. Off darkens only the game view and leaves the interface visible and clickable",
 		section = focusSection,
-		position = 3
+		position = 4
 	)
 	default boolean hideInterface()
 	{
@@ -87,7 +87,7 @@ public interface RooftopGuideConfig extends Config
 		description = "When you finish the last obstacle of the Seers' Village course, show the game interface so you "
 			+ "can teleport back, while the game stays dark and transparent. It hides again when you start the next lap",
 		section = focusSection,
-		position = 7
+		position = 5
 	)
 	default boolean showInterfaceAfterSeersLap()
 	{
@@ -176,7 +176,7 @@ public interface RooftopGuideConfig extends Config
 		name = "Background opacity",
 		description = "How dark the empty part of the bar is, in percent. 0 shows only the fill and outline",
 		section = timerSection,
-		position = 4
+		position = 2
 	)
 	default int timerBackground()
 	{
@@ -190,7 +190,7 @@ public interface RooftopGuideConfig extends Config
 		description = "The bar changes color this many seconds before the obstacle usually ends, so you can look back "
 			+ "in time. 0 changes it exactly at the usual time",
 		section = timerSection,
-		position = 5
+		position = 3
 	)
 	default int timerWarnSeconds()
 	{
@@ -240,7 +240,7 @@ public interface RooftopGuideConfig extends Config
 		description = "Show a mark of grace icon under the timer bar whenever a mark is lying nearby, on any roof, "
 			+ "with x2, x3... for several",
 		section = marksSection,
-		position = 4
+		position = 3
 	)
 	default boolean showMarkBadge()
 	{
