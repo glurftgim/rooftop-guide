@@ -74,11 +74,6 @@ public class RooftopGuidePlugin extends Plugin
 	private static final String LEARNED_NEXT_KEY = "learnedNext";
 	private static final int SUCCESSOR_CONFIRMATIONS = 2;
 
-	/** Window opacity limits and step, matching the Window opacity setting's range. */
-	private static final int MIN_OPACITY = 15;
-	private static final int MAX_OPACITY = 95;
-	private static final int OPACITY_STEP = 5;
-
 	/** Config key (in the plugin's config group) that stores the learned obstacle times. */
 	private static final String LEARNED_KEY = "learnedDurationsV3";
 	private static final int SAMPLES_KEPT = 5;
@@ -133,24 +128,6 @@ public class RooftopGuidePlugin extends Plugin
 	/** Transparent mode lowers the window opacity and puts it back when toggled off. */
 	private boolean transparent;
 	private float opacityBeforeTransparent = 1f;
-
-	private final HotkeyListener opacityUpListener = new HotkeyListener(() -> config.opacityUpHotkey())
-	{
-		@Override
-		public void hotkeyPressed()
-		{
-			adjustOpacity(OPACITY_STEP);
-		}
-	};
-
-	private final HotkeyListener opacityDownListener = new HotkeyListener(() -> config.opacityDownHotkey())
-	{
-		@Override
-		public void hotkeyPressed()
-		{
-			adjustOpacity(-OPACITY_STEP);
-		}
-	};
 
 	/** The last click in the game world, so focus mode can leave a gap in the cover for the game's click cross. */
 	private int clickX = -1;
@@ -247,8 +224,6 @@ public class RooftopGuidePlugin extends Plugin
 		loadLearnedDurations();
 		loadLearnedNext();
 		keyManager.registerKeyListener(hotkeyListener);
-		keyManager.registerKeyListener(opacityUpListener);
-		keyManager.registerKeyListener(opacityDownListener);
 	}
 
 	@Override
@@ -261,8 +236,6 @@ public class RooftopGuidePlugin extends Plugin
 		overlayManager.remove(focusOverlay);
 		overlayManager.remove(focusUnderlay);
 		keyManager.unregisterKeyListener(hotkeyListener);
-		keyManager.unregisterKeyListener(opacityUpListener);
-		keyManager.unregisterKeyListener(opacityDownListener);
 		setTransparent(false);
 		focusMode = false;
 		interfaceRevealed = false;
@@ -340,19 +313,6 @@ public class RooftopGuidePlugin extends Plugin
 				SwingUtilities.invokeLater(() -> applyWindowOpacity(config.transparentOpacity() / 100f));
 			}
 		}
-	}
-
-	/** Raises or lowers the opacity in steps while transparent mode is on, and remembers it in the setting. */
-	private void adjustOpacity(int delta)
-	{
-		if (!transparent)
-		{
-			return;
-		}
-
-		int next = Math.max(MIN_OPACITY, Math.min(MAX_OPACITY, config.transparentOpacity() + delta));
-		configManager.setConfiguration(RooftopGuideConfig.GROUP, "transparentOpacity", next);
-		applyWindowOpacity(next / 100f);
 	}
 
 	/** @return the RuneLite window, found as the window the game canvas sits in, or null if there isn't one yet */

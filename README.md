@@ -1,68 +1,86 @@
-# Rooftop Guide (RuneLite plugin)
+# Rooftop Guide
 
-Highlights the next obstacle on the nine rooftop agility courses (Draynor, Al Kharid, Varrock, Canifis, Falador, Seers,
-Pollnivneach, Rellekka, Ardougne). It only draws an overlay; it never clicks or moves for you. Transparent mode and timer bar allow easy "afk" while doing other tasks on the PC.
+Shows you the next obstacle on rooftop agility courses, with a crossing timer, marks of grace tracking and a session
+box. A transparent mode darkens the game and lets a video show through, so rooftops can be run AFK while you watch
+something else. It only draws on screen: it never clicks or moves for you.
 
-## How it picks the obstacle
-
-The next one in the course's order after the one you just finished (detected by an agility XP gain after clicking it).
-When your position in the course isn't known yet, it falls back to the nearest obstacle on your current level.
-Turn off the built-in Agility plugin's obstacle highlighting to avoid two overlapping highlights.
+![Rooftop Guide on the Ardougne course: the obstacle in progress outlined in orange, the next one in cyan, the timer bar filling at the top and the session box in the corner](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/main.jpg)
 
 ## Features
 
-All rooftop courses. Ardougne, Rellekka, Pollnivneach and Seers' Village are confirmed in game; the others
-start from RuneLite's list order and correct themselves after the real order is seen twice.
+- Highlights the next obstacle, the obstacle you're crossing, and the one after it, each in its own color.
+- A timer bar that fills toward how long each obstacle usually takes you, learned from your own laps, and jumps to full
+  and green the moment the XP drop says you're free to move on.
+- Marks of grace: a glow and light beam on the tile, only when you can actually walk to it, plus a count under the
+  timer bar (x2, x3...) for any marks lying nearby, on any roof.
+- A session box with time, laps, XP, marks of grace and falls, with per-hour rates.
+- Falls are noticed: the timer stops, no lap is counted, and the highlight goes back to the start of the course.
+- Transparent mode for watching something while you play (see below).
+- Hold Alt to drag the timer bar and the session box; drag the timer bar's edges to resize it, down to very thin.
 
-- **Obstacle highlights:** the next obstacle in one color, the obstacle you're crossing in another, and the one after it
-  in a third.
-- **Course order:** an obstacle clicked out of order isn't tracked and no lap is counted for it; the highlight stays on
-  the obstacle you should do next. A click also has to be on an obstacle near you (the Max distance setting), except
-  the start of the course and the obstacle that is next in order, so clicking a far part of the course changes nothing.
-- **Falls:** failing an obstacle ("You slip and fall...") stops its timer, counts no lap, and sends the highlight back
-  to the start of the course. The session box shows how many falls you've had.
-- **Crossing timer:** a bar that fills from your first click on an obstacle toward how long it usually takes you, and
-  turns to the "next obstacle" color once that time has passed (the Warn early setting shifts that earlier). When the
-  agility XP drop arrives, the moment you're free to move on, it jumps to full and stays for a few seconds. Times are
-  learned per obstacle and per tile you clicked from (the course is the same tiles every lap) as the middle of your
-  last five runs, and are remembered between sessions. The bar is empty for an obstacle you haven't finished yet. Only
-  the first click counts, so spam-clicking doesn't reset it. Clicking anywhere else interrupts it: the bar disappears
-  and that run isn't learned from. Clicking the obstacle again starts a fresh timer.
-- **Moving and resizing the bar:** hold Alt and drag it, or drag its edges to resize it. It can be made very thin.
-  Right-click it with Alt held and choose Reset to put it back.
-- **Marks of grace:** a pulsing glow on the tile, a light beam rising from it, and the mark's icon floating on top. By
-  default only marks you can walk to from where you stand are shown, so a mark on another roof stays hidden until it
-  can be picked up.
-- **Mark count:** the mark of grace icon appears under the left end of the timer bar whenever a mark is lying nearby,
-  on any roof, with x2, x3... for several.
-- **Session box:** time, laps, XP, marks of grace and falls, with per-hour rates, refreshed every second. Starts on your
-  first click; right-click it to reset. Hold Alt to move it.
-- **Transparent mode** (hotkey, none by default: set one in the plugin's settings): darkens the game so only the
-  highlights show, and lowers the window opacity so a video can show through. The game's own click cross sprites (yellow walking, red interacting) are drawn
-  over the cover. The Darkness setting goes from solid black down to a light dim. Window opacity changes apply live
-  while it's on, and two optional hotkeys (unset by default) raise or lower it in steps of 5. The "Hide interface"
-  setting (on by default) also covers the interface, and while it is covered, clicks on the inventory and interface
-  panels do nothing, so they can't be hit by accident; clicks in the game world still work. That changes what a click
-  does, which makes it the part of this mode closest to Jagex's rules about menu actions. Turn Hide interface off to
-  darken only the game view and keep the interface visible and clickable. The window opacity is set on the window
-  directly and nothing is saved in RuneLite's settings, so it can't stay stuck after a crash. It needs RuneLite's custom
-  window chrome on; use it with Always on top. After the last obstacle of the Seers' Village course, the interface is
-  shown and clickable so you can teleport back while the game stays dark and transparent, and it hides again when the
-  next lap starts. The "Show interface after Seers' lap" setting (on by default) turns that off. Pressing the hotkey
-  yourself ends it early.
+## Implemented courses
 
-## Config
+- [x] Ardougne
+- [x] Rellekka
+- [x] Pollnivneach
+- [x] Seers' Village
+- [ ] Varrock (set up, but obstacle 6 is not fully verified in game yet)
+- [ ] Draynor (set up, not tested in game yet)
+- [ ] Al Kharid (set up, not tested in game yet)
+- [ ] Canifis (set up, not tested in game yet)
+- [ ] Falador (set up, not tested in game yet)
 
-- **Obstacles:** colors for next / in progress / upcoming, on/off for the in-progress and upcoming highlights, label,
-  max distance.
-- **Timer bar:** on/off, background opacity, how many seconds before the usual time it changes color.
-- **Marks of grace:** highlight on/off, only marks you can reach, count by the timer bar, color.
-- **Session:** the session box on/off.
-- **Transparent mode:** hotkey, darkness, window opacity and its hotkeys, hide interface, show interface after a Seers' lap.
+Courses not tested yet start from RuneLite's own obstacle order and correct themselves after the real order has been
+seen twice.
+
+## How it picks the obstacle
+
+It follows the course's order. The next obstacle is the one after the one you just finished, which it detects from the
+agility XP drop that follows a click. When it doesn't know where you are in the course yet, it falls back to the nearest
+obstacle on your level. An obstacle clicked out of order isn't tracked and no lap is counted for it. Turn off the
+built-in Agility plugin's obstacle highlighting so the two don't overlap.
+
+## The timer bar
+
+![The timer bar filling, with a mark of grace icon and x2 under its left end](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/timer.png)
+
+The bar starts on your first click on an obstacle and ends on the XP drop. Spam-clicking doesn't restart it. Clicking
+anywhere else interrupts it: the bar disappears and that run isn't learned from. It learns a time for each obstacle and
+for the tile you clicked it from (the course is the same tiles every lap), keeps the middle of your last five runs, and
+remembers them between sessions, so the bar is empty only for an obstacle you haven't finished yet. The "Warn early"
+setting changes its color a little before the usual end.
+
+## Transparent mode
+
+Set a hotkey for it in the plugin's settings (there is none by default). It darkens the game so only the highlights,
+timer bar and mark of grace icons show, and lowers the window's opacity so a video behind it shows through. The game's
+own click cross is drawn over the dark cover.
+
+- The Darkness setting goes from solid black down to a light dim.
+- Window opacity can be changed live in the settings while it is on.
+- It needs RuneLite's custom window chrome to be on, and works best with Always on top. The opacity is set on the
+  window directly and isn't saved in RuneLite's settings, so it can't get stuck after a crash.
+- **Hide interface** (on by default) also covers the inventory, chat and minimap. While they are covered, clicks on
+  them do nothing, so they can't be hit by accident; clicks in the game world still work. Turn it off to darken only the
+  game view and keep the interface visible and clickable.
+- After the last Seers' Village obstacle the interface is shown and clickable, so you can teleport back while the game
+  stays dark. It hides again when the next lap starts. A setting turns this off.
+
+## Settings
+
+- **Obstacles:** colors for next, in progress and upcoming; show the in-progress and upcoming highlights; label; max
+  distance.
+- **Timer bar:** on or off, background opacity, how early it warns.
+- **Marks of grace:** highlight on or off, the count under the timer bar, color.
+- **Session:** the session box on or off.
+- **Transparent mode:** hotkey, darkness, window opacity, hide interface, show interface after a
+  Seers' lap.
 
 ## Jagex rules
 
-This plugin only draws overlays and changes how the window looks. It does not click, move, or press keys for you, add
-menu entries, change menu options, move or resize click zones, unhide interface parts, or show anything about boss
-mechanics, other players, or loot. As I read Jagex's third-party client guidelines, none of their listed prohibitions
-apply, but that list says it isn't exhaustive, so the final call is Jagex's and the Plugin Hub reviewers'.
+This plugin only draws overlays and changes how the window looks. It does not click, move or press keys for you, add or
+change menu entries, move or resize click zones, unhide interface parts, or show anything about boss mechanics, other
+players or loot. The one thing that touches input is the interface click block in transparent mode: while the interface
+is covered it ignores clicks on interface panels. It sends nothing to the server and never changes anything in the game
+world. As I read Jagex's third-party client guidelines, none of their listed prohibitions apply, but the list says it
+isn't exhaustive, so the final call is Jagex's and the Plugin Hub reviewers'.

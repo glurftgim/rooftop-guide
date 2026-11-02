@@ -94,30 +94,6 @@ public interface RooftopGuideConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(
-		keyName = "opacityUpHotkey",
-		name = "More opaque hotkey",
-		description = "While transparent mode is on, raises the window opacity by 5 percent",
-		section = focusSection,
-		position = 5
-	)
-	default Keybind opacityUpHotkey()
-	{
-		return Keybind.NOT_SET;
-	}
-
-	@ConfigItem(
-		keyName = "opacityDownHotkey",
-		name = "More transparent hotkey",
-		description = "While transparent mode is on, lowers the window opacity by 5 percent",
-		section = focusSection,
-		position = 6
-	)
-	default Keybind opacityDownHotkey()
-	{
-		return Keybind.NOT_SET;
-	}
-
 	@Alpha
 	@ConfigItem(
 		keyName = "highlightColor",
@@ -254,19 +230,6 @@ public interface RooftopGuideConfig extends Config
 		position = 1
 	)
 	default boolean showMarks()
-	{
-		return true;
-	}
-
-	@ConfigItem(
-		keyName = "onlyLootableMarks",
-		name = "Only marks I can reach",
-		description = "Only show a mark of grace when you can walk to it from where you stand, so marks on another "
-			+ "roof or across a gap stay hidden until they're lootable",
-		section = marksSection,
-		position = 3
-	)
-	default boolean onlyLootableMarks()
 	{
 		return true;
 	}

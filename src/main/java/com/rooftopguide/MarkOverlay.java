@@ -64,11 +64,11 @@ class MarkOverlay extends Overlay
 		return null;
 	}
 
-	/** A mark on the player's level and, if that setting is on, one the player can walk to. */
+	/** A mark on the player's level that the player can walk to from where they stand. */
 	private boolean isVisible(Tile tile, int plane)
 	{
 		return tile.getPlane() == plane && tile.getLocalLocation() != null
-			&& (!config.onlyLootableMarks() || reach.canReach(tile));
+			&& reach.canReach(tile);
 	}
 
 	/** @return how many marks of grace are lying anywhere nearby, on any roof or level, counting stacks */
