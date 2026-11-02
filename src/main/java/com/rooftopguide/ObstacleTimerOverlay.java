@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
@@ -31,6 +32,7 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 class ObstacleTimerOverlay extends Overlay
 {
 	private static final Dimension DEFAULT_SIZE = new Dimension(240, 16);
+	private static final Dimension DEFAULT_SIZE_VERTICAL = new Dimension(16, 240);
 	private static final int MAX_ARC = 14;
 	private static final int MIN_ICON_HEIGHT = 16;
 	private static final int MAX_ICON_HEIGHT = 32;
@@ -68,7 +70,8 @@ class ObstacleTimerOverlay extends Overlay
 		{
 			return null;
 		}
-		Dimension size = getPreferredSize() != null ? getPreferredSize() : DEFAULT_SIZE;
+		Dimension size = getPreferredSize() != null ? getPreferredSize()
+			: config.timerVertical() ? DEFAULT_SIZE_VERTICAL : DEFAULT_SIZE;
 		// in transparent mode the FocusOverlay draws this above the cover, at this overlay's current spot; returning
 		// the size either way keeps the bounds current so it can still be dragged
 		if (!plugin.isFocusMode())
@@ -126,7 +129,38 @@ class ObstacleTimerOverlay extends Overlay
 		}
 	}
 
+	/**
+	 * Swaps the bar's width and height when the orientation setting is switched, so a bar you have resized turns with
+	 * it. Does nothing if the bar still has its default size.
+	 */
+	void flipSize()
+	{
+		Dimension size = getPreferredSize();
+		if (size != null)
+		{
+			setPreferredSize(new Dimension(size.height, size.width));
+		}
+	}
+
+	/** Draws the bar in the size given, filling to the right, or upward if the bar is set to be vertical. */
 	private void drawBar(Graphics2D graphics, Dimension size, boolean placeholder)
+	{
+		if (!config.timerVertical())
+		{
+			drawBarAcross(graphics, size, placeholder);
+			return;
+		}
+
+		// A vertical bar is the same bar turned a quarter, so the fill starts at the bottom and rises. Draw it as a
+		// horizontal bar as long as this one is tall, then turn it.
+		AffineTransform saved = graphics.getTransform();
+		graphics.translate(0, size.height);
+		graphics.rotate(-Math.PI / 2);
+		drawBarAcross(graphics, new Dimension(size.height, size.width), placeholder);
+		graphics.setTransform(saved);
+	}
+
+	private void drawBarAcross(Graphics2D graphics, Dimension size, boolean placeholder)
 	{
 		int width = size.width;
 		int height = size.height;

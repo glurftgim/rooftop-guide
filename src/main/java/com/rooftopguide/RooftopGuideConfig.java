@@ -170,6 +170,19 @@ public interface RooftopGuideConfig extends Config
 		return true;
 	}
 
+	@ConfigItem(
+		keyName = "timerVertical",
+		name = "Vertical bar",
+		description = "Fill the timer bar upward, like a thermometer, instead of to the right. Switching this swaps the "
+			+ "bar's width and height, so a bar you have resized turns with it",
+		section = timerSection,
+		position = 2
+	)
+	default boolean timerVertical()
+	{
+		return false;
+	}
+
 	@Range(min = 0, max = 100)
 	@ConfigItem(
 		keyName = "timerBackground",

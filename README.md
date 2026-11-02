@@ -72,7 +72,7 @@ own click cross is drawn over the dark cover.
 
 - **Obstacles:** colors for next, in progress and upcoming; show the in-progress and upcoming highlights; label; max
   distance.
-- **Timer bar:** on or off, background opacity, how early it warns.
+- **Timer bar:** on or off, vertical (fills upward) or horizontal, background opacity, how early it warns.
 - **Marks of grace:** highlight on or off, the count under the timer bar, color.
 - **Session:** the session box on or off.
 - **Transparent mode:** hotkey, darkness, window opacity, hide interface, show interface after a
