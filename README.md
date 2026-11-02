@@ -42,7 +42,7 @@ built-in Agility plugin's obstacle highlighting so the two don't overlap.
 
 ## The timer bar
 
-![The timer bar filling, with a mark of grace icon and x2 under its left end](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/timer.png)
+![The timer bar filling toward your usual time for the obstacle, then jumping to full and green when the XP drop arrives](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/timer-bar.gif)
 
 The bar starts on your first click on an obstacle and ends on the XP drop. Spam-clicking doesn't restart it. Clicking
 anywhere else interrupts it: the bar disappears and that run isn't learned from. It learns a time for each obstacle and
