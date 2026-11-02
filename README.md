@@ -1,7 +1,7 @@
 # Rooftop Guide (RuneLite plugin)
 
 Highlights the next obstacle on the nine rooftop agility courses (Draynor, Al Kharid, Varrock, Canifis, Falador, Seers,
-Pollnivneach, Rellekka, Ardougne). It only draws an overlay; it never clicks or moves for you.
+Pollnivneach, Rellekka, Ardougne). It only draws an overlay; it never clicks or moves for you. Transparent mode and timer bar allow easy "afk" while doing other tasks on the PC.
 
 ## How it picks the obstacle
 
