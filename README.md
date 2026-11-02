@@ -52,6 +52,8 @@ setting changes its color a little before the usual end.
 
 ## Transparent mode
 
+![Transparent mode over a video: the game is dark and see-through, and only the timer bar and highlights show](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/transparent.jpg)
+
 Set a hotkey for it in the plugin's settings (there is none by default). It darkens the game so only the highlights,
 timer bar and mark of grace icons show, and lowers the window's opacity so a video behind it shows through. The game's
 own click cross is drawn over the dark cover.
