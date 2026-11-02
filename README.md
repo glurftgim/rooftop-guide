@@ -3,16 +3,6 @@
 Highlights the next obstacle on the nine rooftop agility courses (Draynor, Al Kharid, Varrock, Canifis, Falador, Seers,
 Pollnivneach, Rellekka, Ardougne). It only draws an overlay; it never clicks or moves for you.
 
-## Setup
-
-1. Install a JDK 11+ (e.g. Temurin 17) and IntelliJ IDEA Community.
-2. Open this folder in IntelliJ as a Gradle project. The Gradle wrapper (`gradlew`) is included.
-3. Run `RooftopGuidePluginTest.main` (src/test) to launch RuneLite with the plugin loaded. Use a run configuration
-   with the program argument `--developer-mode` and the VM option `-ea`.
-4. Log in with RuneLite's Jagex auth panel in the sidebar, then enable Rooftop Guide in RuneLite's settings.
-
-To build the jar: `./gradlew build` (output in `build/libs`).
-
 ## How it picks the obstacle
 
 The next one in the course's order after the one you just finished (detected by an agility XP gain after clicking it).
