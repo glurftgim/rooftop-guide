@@ -63,7 +63,7 @@ abstract class FocusCover extends Overlay
 
 		markOverlay.renderHighlights(graphics);
 		obstacleOverlay.renderHighlights(graphics);
-		timerOverlay.renderTimer(graphics);
+		timerOverlay.renderOnCover(graphics);
 		drawClickCross(graphics);
 		return null;
 	}

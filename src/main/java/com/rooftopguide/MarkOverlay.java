@@ -15,6 +15,7 @@ import net.runelite.api.Perspective;
 import net.runelite.api.Player;
 import net.runelite.api.Point;
 import net.runelite.api.Tile;
+import net.runelite.api.TileItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -28,7 +29,7 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 class MarkOverlay extends Overlay
 {
 	/** Item ID of a mark of grace, used to draw its icon. */
-	private static final int MARK_OF_GRACE = 11849;
+	static final int MARK_OF_GRACE = 11849;
 
 	private static final int BEAM_HEIGHT = 70;
 	private static final double PULSE_MILLIS = 900;
@@ -37,10 +38,13 @@ class MarkOverlay extends Overlay
 	private final RooftopGuidePlugin plugin;
 	private final RooftopGuideConfig config;
 	private final ItemManager itemManager;
+	private final MarkReach reach;
 
 	@Inject
-	private MarkOverlay(Client client, RooftopGuidePlugin plugin, RooftopGuideConfig config, ItemManager itemManager)
+	private MarkOverlay(Client client, RooftopGuidePlugin plugin, RooftopGuideConfig config, ItemManager itemManager,
+		MarkReach reach)
 	{
+		this.reach = reach;
 		this.client = client;
 		this.plugin = plugin;
 		this.config = config;
@@ -60,6 +64,24 @@ class MarkOverlay extends Overlay
 		return null;
 	}
 
+	/** A mark on the player's level and, if that setting is on, one the player can walk to. */
+	private boolean isVisible(Tile tile, int plane)
+	{
+		return tile.getPlane() == plane && tile.getLocalLocation() != null
+			&& (!config.onlyLootableMarks() || reach.canReach(tile));
+	}
+
+	/** @return how many marks of grace are lying anywhere nearby, on any roof or level, counting stacks */
+	int countMarks()
+	{
+		int count = 0;
+		for (TileItem mark : plugin.getMarks().keySet())
+		{
+			count += Math.max(1, mark.getQuantity());
+		}
+		return count;
+	}
+
 	void renderHighlights(Graphics2D graphics)
 	{
 		Player player = client.getLocalPlayer();
@@ -75,7 +97,7 @@ class MarkOverlay extends Overlay
 
 		for (Tile tile : plugin.getMarks().values())
 		{
-			if (tile.getPlane() != plane || tile.getLocalLocation() == null)
+			if (!isVisible(tile, plane))
 			{
 				continue;
 			}

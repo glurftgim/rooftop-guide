@@ -7,8 +7,8 @@ Pollnivneach, Rellekka, Ardougne). It only draws an overlay; it never clicks or 
 
 1. Install a JDK 11+ (e.g. Temurin 17) and IntelliJ IDEA Community.
 2. Open this folder in IntelliJ as a Gradle project. The Gradle wrapper (`gradlew`) is included.
-3. Run `RooftopGuidePluginTest.main` (src/test) to launch RuneLite with the
-   plugin loaded. Use a run configuration with the program argument `--developer-mode` and the VM option `-ea`.
+3. Run `RooftopGuidePluginTest.main` (src/test) to launch RuneLite with the plugin loaded. Use a run configuration
+   with the program argument `--developer-mode` and the VM option `-ea`.
 4. Log in with RuneLite's Jagex auth panel in the sidebar, then enable Rooftop Guide in RuneLite's settings.
 
 To build the jar: `./gradlew build` (output in `build/libs`).
@@ -21,37 +21,52 @@ Turn off the built-in Agility plugin's obstacle highlighting to avoid two overla
 
 ## Features
 
-All rooftop courses; Ardougne's order is confirmed in game, the others start from RuneLite's list order and correct
+All rooftop courses. Ardougne's order is confirmed in game; the others start from RuneLite's list order and correct
 themselves after the real order is seen twice.
 
-- Next obstacle in one color, the obstacle you're crossing in another, and the one after it in a third.
-- Crossing timer: a bar at the top of the screen while you cross an obstacle, filling toward how long that obstacle
-  usually takes you (learned from your own laps and remembered between sessions), and changing color once that time
-  has passed. It also shows in transparent mode. Only the first click counts, so spam-clicking the obstacle doesn't
-  reset it. Clicking anywhere else interrupts it: the bar disappears and that run isn't learned from. Clicking the
-  obstacle again after an interruption starts a fresh timer.
-- Marks of grace: a pulsing glow on the tile, a light beam rising from it, and the mark's icon floating on top.
-- Session box: time, laps, XP and marks of grace with per-hour rates. Starts on your first click; right-click it to reset.
-- Course order: an obstacle clicked out of order isn't tracked and no lap is counted for it; the highlight
-  stays on the obstacle you should do next. A click also has to be on an obstacle near you (the Max distance setting),
-  except the start of the course, so clicking a far part of the course changes nothing.
-- Transparent mode (hotkey, default Ctrl+H): darkens the game so only the highlights show, and lowers the window
+- **Obstacle highlights:** the next obstacle in one color, the obstacle you're crossing in another, and the one after it
+  in a third.
+- **Course order:** an obstacle clicked out of order isn't tracked and no lap is counted for it; the highlight stays on
+  the obstacle you should do next. A click also has to be on an obstacle near you (the Max distance setting), except
+  the start of the course, so clicking a far part of the course changes nothing.
+- **Falls:** failing an obstacle ("You slip and fall...") stops its timer, counts no lap, and sends the highlight back
+  to the start of the course. The session box shows how many falls you've had.
+- **Crossing timer:** a bar that fills from your first click on an obstacle toward how long it usually takes you, and
+  turns to the "next obstacle" color once that time has passed (the Warn early setting shifts that earlier). When the
+  agility XP drop arrives, the moment you're free to move on, it jumps to full and stays for a few seconds. Times are
+  learned per obstacle and per tile you clicked from (the course is the same tiles every lap) as the middle of your
+  last five runs, and are remembered between sessions. The bar is empty for an obstacle you haven't finished yet. Only
+  the first click counts, so spam-clicking doesn't reset it. Clicking anywhere else interrupts it: the bar disappears
+  and that run isn't learned from. Clicking the obstacle again starts a fresh timer.
+- **Moving and resizing the bar:** hold Alt and drag it, or drag its edges to resize it. It can be made very thin.
+  Right-click it with Alt held and choose Reset to put it back.
+- **Marks of grace:** a pulsing glow on the tile, a light beam rising from it, and the mark's icon floating on top. By
+  default only marks you can walk to from where you stand are shown, so a mark on another roof stays hidden until it
+  can be picked up.
+- **Mark count:** the mark of grace icon appears under the left end of the timer bar whenever a mark is lying nearby,
+  on any roof, with x2, x3... for several.
+- **Session box:** time, laps, XP, marks of grace and falls, with per-hour rates, refreshed every second. Starts on your
+  first click; right-click it to reset. Hold Alt to move it.
+- **Transparent mode** (hotkey, none by default: set one in the plugin's settings): darkens the game so only the highlights show, and lowers the window
   opacity so a video can show through. The game's own click cross sprites (yellow walking, red interacting) are drawn
   over the cover. The Darkness setting goes from solid black down to a light dim. Window opacity changes apply live
-  while it's on, and Ctrl+= / Ctrl+- raise or lower it in steps of 5. The "Hide interface" setting (on by default)
-  also covers the interface; turn it off to darken only the game view and keep the interface visible. The window
+  while it's on, and two optional hotkeys (also unset by default) raise or lower it in steps of 5. The "Hide
+  interface" setting (off by default) also covers the interface; leave it off to darken only the game view and keep
+  the interface visible. The window
   opacity is set on the window directly and nothing is saved in RuneLite's settings, so it can't stay stuck after a
   crash. It needs RuneLite's custom window chrome on; use it with Always on top. Covered interface parts can still be
-  clicked.
-  After the last obstacle of a course, the interface is shown (for example to teleport) while the game stays dark and
-  transparent, and it hides again when the next lap starts. The "Show interface after a lap" setting picks Seers'
-  Village only (default), all courses, or never. Pressing the hotkey yourself ends it early.
+  clicked. After the last obstacle of the Seers' Village course, the interface is shown so you can teleport back while
+  the game stays dark and transparent, and it hides again when the next lap starts. The "Show interface after Seers'
+  lap" setting (on by default) turns that off. Pressing the hotkey yourself ends it early.
 
 ## Config
 
-Transparent mode hotkey, darkness and window opacity, colors for next / in progress / upcoming, on/off for the
-in-progress highlight, the upcoming highlight and the timer bar, label, max distance, marks highlight and color,
-session box.
+- **Obstacles:** colors for next / in progress / upcoming, on/off for the in-progress and upcoming highlights, label,
+  max distance.
+- **Timer bar:** on/off, background opacity, how many seconds before the usual time it changes color.
+- **Marks of grace:** highlight on/off, only marks you can reach, count by the timer bar, color.
+- **Session:** the session box on/off.
+- **Transparent mode:** hotkey, darkness, window opacity and its hotkeys, hide interface, show interface after a Seers' lap.
 
 ## Jagex rules
 

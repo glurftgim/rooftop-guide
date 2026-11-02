@@ -22,7 +22,7 @@ class SessionOverlay extends OverlayPanel
 	private static final long MIN_SECONDS_FOR_RATES = 60;
 
 	/** How often the numbers are recalculated. */
-	private static final long UPDATE_SECONDS = 5;
+	private static final long UPDATE_SECONDS = 1;
 
 	private final RooftopGuidePlugin plugin;
 	private final RooftopGuideConfig config;
@@ -67,6 +67,10 @@ class SessionOverlay extends OverlayPanel
 		line("Laps", lapsText);
 		line("XP", xpText);
 		line("Marks", marksText);
+		if (plugin.getFalls() > 0)
+		{
+			line("Falls", Integer.toString(plugin.getFalls()));
+		}
 
 		return super.render(graphics);
 	}

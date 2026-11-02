@@ -1,8 +1,6 @@
 package com.rooftopguide;
 
 import java.awt.Color;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import net.runelite.client.config.Alpha;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
@@ -19,13 +17,16 @@ public interface RooftopGuideConfig extends Config
 	@ConfigSection(name = "Obstacles", description = "How obstacles are highlighted", position = 1)
 	String obstacleSection = "obstacles";
 
-	@ConfigSection(name = "Marks of grace", description = "Marks of grace highlight", position = 2)
+	@ConfigSection(name = "Timer bar", description = "The crossing timer bar. Hold Alt and drag it to move it", position = 2)
+	String timerSection = "timer";
+
+	@ConfigSection(name = "Marks of grace", description = "Marks of grace highlight", position = 3)
 	String marksSection = "marks";
 
-	@ConfigSection(name = "Session", description = "Laps and rate overlay", position = 3)
+	@ConfigSection(name = "Session", description = "Laps and rate overlay", position = 4)
 	String sessionSection = "session";
 
-	@ConfigSection(name = "Transparent mode", description = "Hide the game and make the window see-through, leaving only the highlights", position = 4)
+	@ConfigSection(name = "Transparent mode", description = "Hide the game and make the window see-through, leaving only the highlights", position = 5)
 	String focusSection = "focus";
 
 	@ConfigItem(
@@ -37,7 +38,7 @@ public interface RooftopGuideConfig extends Config
 	)
 	default Keybind focusHotkey()
 	{
-		return new Keybind(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK);
+		return Keybind.NOT_SET;
 	}
 
 	@Range(min = 0, max = 100)
@@ -70,48 +71,27 @@ public interface RooftopGuideConfig extends Config
 	@ConfigItem(
 		keyName = "hideInterface",
 		name = "Hide interface",
-		description = "Also cover the game interface (inventory, chat, minimap). Turn off to darken only the game view "
-			+ "and keep the interface visible",
+		description = "Also cover the game interface (inventory, chat, minimap). Off darkens only the game view "
+			+ "and keeps the interface visible",
 		section = focusSection,
 		position = 3
 	)
 	default boolean hideInterface()
 	{
-		return true;
+		return false;
 	}
 
 	@ConfigItem(
-		keyName = "interfaceAfterLap",
-		name = "Show interface after a lap",
-		description = "When you finish the last obstacle of a course, show the game interface (for example to teleport) "
-			+ "while the game stays dark and transparent. It hides again when you start the next lap",
+		keyName = "showInterfaceAfterSeersLap",
+		name = "Show interface after Seers' lap",
+		description = "When you finish the last obstacle of the Seers' Village course, show the game interface so you "
+			+ "can teleport back, while the game stays dark and transparent. It hides again when you start the next lap",
 		section = focusSection,
 		position = 7
 	)
-	default InterfaceAfterLap interfaceAfterLap()
+	default boolean showInterfaceAfterSeersLap()
 	{
-		return InterfaceAfterLap.SEERS;
-	}
-
-	/** Which courses show the interface again after the last obstacle. */
-	enum InterfaceAfterLap
-	{
-		NEVER("Never"),
-		SEERS("Seers' Village only"),
-		ALL("All courses");
-
-		private final String label;
-
-		InterfaceAfterLap(String label)
-		{
-			this.label = label;
-		}
-
-		@Override
-		public String toString()
-		{
-			return label;
-		}
+		return true;
 	}
 
 	@ConfigItem(
@@ -123,7 +103,7 @@ public interface RooftopGuideConfig extends Config
 	)
 	default Keybind opacityUpHotkey()
 	{
-		return new Keybind(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK);
+		return Keybind.NOT_SET;
 	}
 
 	@ConfigItem(
@@ -135,7 +115,7 @@ public interface RooftopGuideConfig extends Config
 	)
 	default Keybind opacityDownHotkey()
 	{
-		return new Keybind(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK);
+		return Keybind.NOT_SET;
 	}
 
 	@Alpha
@@ -206,12 +186,39 @@ public interface RooftopGuideConfig extends Config
 		name = "Show timer bar",
 		description = "Show a bar at the top of the screen while crossing an obstacle, filling toward how long "
 			+ "it usually takes you. Turn off to hide it",
-		section = obstacleSection,
-		position = 6
+		section = timerSection,
+		position = 1
 	)
 	default boolean showCrossingTimer()
 	{
 		return true;
+	}
+
+	@Range(min = 0, max = 100)
+	@ConfigItem(
+		keyName = "timerBackground",
+		name = "Background opacity",
+		description = "How dark the empty part of the bar is, in percent. 0 shows only the fill and outline",
+		section = timerSection,
+		position = 4
+	)
+	default int timerBackground()
+	{
+		return 67;
+	}
+
+	@Range(min = 0, max = 10)
+	@ConfigItem(
+		keyName = "timerWarnSeconds",
+		name = "Warn early (seconds)",
+		description = "The bar changes color this many seconds before the obstacle usually ends, so you can look back "
+			+ "in time. 0 changes it exactly at the usual time",
+		section = timerSection,
+		position = 5
+	)
+	default int timerWarnSeconds()
+	{
+		return 1;
 	}
 
 	@ConfigItem(
@@ -219,11 +226,11 @@ public interface RooftopGuideConfig extends Config
 		name = "Show label",
 		description = "Show a short label above the highlighted obstacles",
 		section = obstacleSection,
-		position = 7
+		position = 6
 	)
 	default boolean showLabel()
 	{
-		return true;
+		return false;
 	}
 
 	@Range(min = 3, max = 30)
@@ -232,7 +239,7 @@ public interface RooftopGuideConfig extends Config
 		name = "Max distance",
 		description = "Only consider obstacles within this many tiles of you",
 		section = obstacleSection,
-		position = 8
+		position = 7
 	)
 	default int maxDistance()
 	{
@@ -247,6 +254,32 @@ public interface RooftopGuideConfig extends Config
 		position = 1
 	)
 	default boolean showMarks()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "onlyLootableMarks",
+		name = "Only marks I can reach",
+		description = "Only show a mark of grace when you can walk to it from where you stand, so marks on another "
+			+ "roof or across a gap stay hidden until they're lootable",
+		section = marksSection,
+		position = 3
+	)
+	default boolean onlyLootableMarks()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "showMarkBadge",
+		name = "Show count by timer bar",
+		description = "Show a mark of grace icon under the timer bar whenever a mark is lying nearby, on any roof, "
+			+ "with x2, x3... for several",
+		section = marksSection,
+		position = 4
+	)
+	default boolean showMarkBadge()
 	{
 		return true;
 	}

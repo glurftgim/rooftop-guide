@@ -6,13 +6,17 @@ import java.awt.IllegalComponentStateException;
 import java.awt.Window;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import net.runelite.api.Client;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.GameState;
 import net.runelite.api.MenuAction;
 import net.runelite.api.Player;
@@ -22,6 +26,7 @@ import net.runelite.api.TileItem;
 import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.DecorativeObjectDespawned;
 import net.runelite.api.events.DecorativeObjectSpawned;
 import net.runelite.api.events.GameObjectDespawned;
@@ -46,6 +51,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.HotkeyListener;
+import net.runelite.client.util.Text;
 
 /**
  * Highlights the next rooftop obstacle. Purely visual: it never clicks or moves for the player.
@@ -74,7 +80,9 @@ public class RooftopGuidePlugin extends Plugin
 	private static final int OPACITY_STEP = 5;
 
 	/** Config key (in the plugin's config group) that stores the learned obstacle times. */
-	private static final String LEARNED_KEY = "learnedDurations";
+	private static final String LEARNED_KEY = "learnedDurationsV3";
+	private static final int SAMPLES_KEPT = 5;
+	private static final long READY_HOLD_MILLIS = 3_000;
 
 	/** Measured times outside this range are ignored: too short is a mis-detection, too long was interrupted. */
 	private static final long MIN_LEARNED_MILLIS = 1_000;
@@ -85,9 +93,6 @@ public class RooftopGuidePlugin extends Plugin
 
 	/** Search radius for an obstacle in a known course order; effectively the whole loaded scene. */
 	private static final int ORDERED_SEARCH_RADIUS = 100;
-
-	/** Item ID of a mark of grace. */
-	private static final int MARK_OF_GRACE = 11849;
 
 	@Inject
 	private Client client;
@@ -178,6 +183,7 @@ public class RooftopGuidePlugin extends Plugin
 	private int laps;
 	private int xpGained;
 	private int marksGained;
+	private int falls;
 	private int lastMarkCount = -1;
 
 	/**
@@ -196,9 +202,14 @@ public class RooftopGuidePlugin extends Plugin
 	private int outOfOrderId = -1;
 	private long outOfOrderMillis;
 
-	/** When the obstacle in progress was clicked, and how long each obstacle usually takes (averaged from your laps). */
+	/**
+	 * When the obstacle in progress was clicked, and (below) how long each obstacle takes you, learned from your laps.
+	 */
 	private long pendingStartMillis;
-	private final Map<Integer, Long> learnedMillis = new HashMap<>();
+	private long finishedAtMillis;
+	// the last few click-to-XP times per obstacle and starting tile, the course being the same tiles every lap
+	private final Map<String, List<Long>> learnedSamples = new HashMap<>();
+	private String pendingKey = "";
 
 	/**
 	 * Corrections to the course order, learned from play: the obstacle that really follows another when it differs
@@ -291,17 +302,10 @@ public class RooftopGuidePlugin extends Plugin
 		return focusMode && (!config.hideInterface() || interfaceRevealed);
 	}
 
+	/** Only Seers' Village needs it: its lap ends with a teleport back to the start. */
 	private boolean showsInterfaceAfterLap(RooftopCourse course)
 	{
-		switch (config.interfaceAfterLap())
-		{
-			case ALL:
-				return true;
-			case SEERS:
-				return course == RooftopCourse.SEERS;
-			default:
-				return false;
-		}
+		return course == RooftopCourse.SEERS && config.showInterfaceAfterSeersLap();
 	}
 
 	/** Transparent mode: covers the game so only the highlights show, and makes the window see-through. */
@@ -433,28 +437,66 @@ public class RooftopGuidePlugin extends Plugin
 		return pendingInterrupted;
 	}
 
+	/**
+	 * @return true for a moment after the XP drop that ends an obstacle, until the next one is clicked: the tick the
+	 * character is free to move on, which the timer bar shows as full and green
+	 */
+	boolean isReadyForNext()
+	{
+		return pendingId == -1 && finishedAtMillis != 0 && System.currentTimeMillis() - finishedAtMillis < READY_HOLD_MILLIS;
+	}
+
 	/** @return milliseconds since the obstacle in progress was clicked */
 	long getPendingElapsedMillis()
 	{
 		return System.currentTimeMillis() - pendingStartMillis;
 	}
 
-	/** @return how long this obstacle usually takes you in milliseconds, or null if not learned yet */
-	Long getExpectedMillis(int obstacleId)
+	/**
+	 * @return how long the obstacle in progress usually takes from the tile it was clicked from, in milliseconds. The
+	 * course is the same tiles every lap, so that is the exact case; if this tile hasn't been seen, the obstacle's
+	 * times from other tiles stand in. Null if the obstacle hasn't been completed yet.
+	 */
+	Long getPendingExpectedMillis()
 	{
-		return learnedMillis.get(obstacleId);
+		List<Long> samples = learnedSamples.get(pendingKey);
+		if (samples == null || samples.isEmpty())
+		{
+			String prefix = pendingId + "@";
+			samples = new ArrayList<>();
+			for (Map.Entry<String, List<Long>> entry : learnedSamples.entrySet())
+			{
+				if (entry.getKey().startsWith(prefix))
+				{
+					samples.addAll(entry.getValue());
+				}
+			}
+		}
+		return samples.isEmpty() ? null : median(samples);
 	}
 
-	/** Blends a measured time into the average for the obstacle, ignoring times that were clearly interrupted. */
-	private void learnDuration(int obstacleId, long millis)
+	/** The middle value, so a one-off slow or fast run doesn't move it. */
+	private static long median(List<Long> values)
+	{
+		List<Long> sorted = new ArrayList<>(values);
+		Collections.sort(sorted);
+		return sorted.get(sorted.size() / 2);
+	}
+
+	/** Keeps this run's time among the last few for the obstacle and tile it started from. Interrupted runs are skipped. */
+	private void learnDuration(long millis)
 	{
 		if (millis < MIN_LEARNED_MILLIS || millis > MAX_LEARNED_MILLIS)
 		{
 			return;
 		}
 
-		Long previous = learnedMillis.get(obstacleId);
-		learnedMillis.put(obstacleId, previous == null ? millis : Math.round(previous * 0.7 + millis * 0.3));
+		List<Long> samples = learnedSamples.computeIfAbsent(pendingKey, key -> new ArrayList<>());
+		samples.add(millis);
+		while (samples.size() > SAMPLES_KEPT)
+		{
+			samples.remove(0);
+		}
 		saveLearnedDurations();
 	}
 
@@ -519,13 +561,18 @@ public class RooftopGuidePlugin extends Plugin
 	private void saveLearnedDurations()
 	{
 		StringBuilder encoded = new StringBuilder();
-		learnedMillis.forEach((id, millis) -> encoded.append(id).append('=').append(millis).append(';'));
+		learnedSamples.forEach((key, samples) ->
+		{
+			encoded.append(key).append('=');
+			samples.forEach(millis -> encoded.append(millis).append(','));
+			encoded.append(';');
+		});
 		configManager.setConfiguration(RooftopGuideConfig.GROUP, LEARNED_KEY, encoded.toString());
 	}
 
 	private void loadLearnedDurations()
 	{
-		learnedMillis.clear();
+		learnedSamples.clear();
 		String encoded = configManager.getConfiguration(RooftopGuideConfig.GROUP, LEARNED_KEY);
 		if (encoded == null)
 		{
@@ -541,7 +588,15 @@ public class RooftopGuidePlugin extends Plugin
 			}
 			try
 			{
-				learnedMillis.put(Integer.parseInt(parts[0]), Long.parseLong(parts[1]));
+				List<Long> samples = new ArrayList<>();
+				for (String millis : parts[1].split(","))
+				{
+					if (!millis.isEmpty())
+					{
+						samples.add(Long.parseLong(millis));
+					}
+				}
+				learnedSamples.put(parts[0], samples);
 			}
 			catch (NumberFormatException e)
 			{
@@ -570,9 +625,15 @@ public class RooftopGuidePlugin extends Plugin
 		return marksGained;
 	}
 
+	int getFalls()
+	{
+		return falls;
+	}
+
 	void resetSession()
 	{
 		sessionStart = null;
+		falls = 0;
 		laps = 0;
 		xpGained = 0;
 		marksGained = 0;
@@ -676,6 +737,38 @@ public class RooftopGuidePlugin extends Plugin
 		}
 	}
 
+	/**
+	 * Failing an obstacle ("You slip and fall...") drops you off the roof. The obstacle wasn't finished, so its timer
+	 * stops and no lap is counted; the course starts over, so the first obstacle is the next one.
+	 */
+	@Subscribe
+	public void onChatMessage(ChatMessage event)
+	{
+		if (event.getType() != ChatMessageType.GAMEMESSAGE)
+		{
+			return;
+		}
+		String message = Text.removeTags(event.getMessage()).toLowerCase();
+		if (!message.contains("you slip and fall") && !message.startsWith("you fall"))
+		{
+			return;
+		}
+
+		int courseObstacleId = pendingId != -1 ? pendingId : lastCompletedId;
+		RooftopCourse course = courseObstacleId == -1 ? null : RooftopCourse.forObstacle(courseObstacleId);
+		if (course == null)
+		{
+			return;
+		}
+
+		falls++;
+		clearPending();
+		outOfOrderId = -1;
+		// the next obstacle after the last one is the first one
+		lastCompleted = null;
+		lastCompletedId = course.lastObstacleId();
+	}
+
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
@@ -751,12 +844,25 @@ public class RooftopGuidePlugin extends Plugin
 		pendingWorld = clicked.getWorldLocation();
 		pendingTicks = 0;
 		pendingStartMillis = System.currentTimeMillis();
+		pendingKey = startKey(clicked.getId());
 		pendingInterrupted = false;
 		interfaceRevealed = false;
 		if (sessionStart == null)
 		{
 			sessionStart = Instant.now();
 		}
+	}
+
+	/** Identifies an obstacle plus the tile the player clicked it from, e.g. "15609@2670@3297@3". */
+	private String startKey(int obstacleId)
+	{
+		Player player = client.getLocalPlayer();
+		if (player == null)
+		{
+			return obstacleId + "@";
+		}
+		WorldPoint at = player.getWorldLocation();
+		return obstacleId + "@" + at.getX() + "@" + at.getY() + "@" + at.getPlane();
 	}
 
 	/** The obstacle in progress, if any, was interrupted: its timer stops and the run isn't learned from. */
@@ -855,11 +961,12 @@ public class RooftopGuidePlugin extends Plugin
 			}
 			if (!pendingInterrupted)
 			{
-				learnDuration(pendingId, System.currentTimeMillis() - pendingStartMillis);
+				learnDuration(System.currentTimeMillis() - pendingStartMillis);
 			}
 			lastCompleted = pending;
 			lastCompletedId = pendingId;
 			outOfOrderId = -1;
+			finishedAtMillis = System.currentTimeMillis();
 			clearPending();
 		}
 		else if (outOfOrderId != -1 && System.currentTimeMillis() - outOfOrderMillis < OUT_OF_ORDER_SYNC_MILLIS)
@@ -926,7 +1033,7 @@ public class RooftopGuidePlugin extends Plugin
 	@Subscribe
 	public void onItemSpawned(ItemSpawned event)
 	{
-		if (event.getItem().getId() == MARK_OF_GRACE)
+		if (event.getItem().getId() == MarkOverlay.MARK_OF_GRACE)
 		{
 			marks.put(event.getItem(), event.getTile());
 		}
@@ -946,7 +1053,7 @@ public class RooftopGuidePlugin extends Plugin
 			return;
 		}
 
-		int count = event.getItemContainer().count(MARK_OF_GRACE);
+		int count = event.getItemContainer().count(MarkOverlay.MARK_OF_GRACE);
 		if (lastMarkCount >= 0 && count > lastMarkCount && sessionStart != null)
 		{
 			marksGained += count - lastMarkCount;

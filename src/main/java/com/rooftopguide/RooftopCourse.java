@@ -76,19 +76,6 @@ enum RooftopCourse
 		return displayName;
 	}
 
-	/** @return the 1-based position of the obstacle in its course, or -1 if it isn't one of this course's */
-	int positionOf(int objectId)
-	{
-		for (int i = 0; i < obstacleIds.length; i++)
-		{
-			if (obstacleIds[i] == objectId)
-			{
-				return i + 1;
-			}
-		}
-		return -1;
-	}
-
 	/** @return the ID of the obstacle that ends a lap */
 	int lastObstacleId()
 	{
