@@ -194,6 +194,7 @@ public class RooftopGuidePlugin extends Plugin
 	private int pendingId = -1;
 	private WorldPoint pendingWorld;
 	private int pendingTicks;
+	private int pendingStartDistance;
 
 	/**
 	 * An obstacle clicked out of course order. It isn't tracked as in progress, but if agility XP follows soon after,
@@ -320,10 +321,24 @@ public class RooftopGuidePlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
-		if (transparent && RooftopGuideConfig.GROUP.equals(event.getGroup())
-			&& "transparentOpacity".equals(event.getKey()))
+		if (!transparent)
+		{
+			return;
+		}
+
+		if (RooftopGuideConfig.GROUP.equals(event.getGroup()) && "transparentOpacity".equals(event.getKey()))
 		{
 			applyWindowOpacity(config.transparentOpacity() / 100f);
+		}
+		else if ("runelite".equals(event.getGroup()))
+		{
+			// Any RuneLite setting change (for example saving a dragged overlay's position) makes RuneLite put its own
+			// window opacity back. Queue ours behind that so transparent mode keeps its opacity.
+			Window frame = findWindow();
+			if (frame != null)
+			{
+				SwingUtilities.invokeLater(() -> applyWindowOpacity(config.transparentOpacity() / 100f));
+			}
 		}
 	}
 
@@ -656,8 +671,17 @@ public class RooftopGuidePlugin extends Plugin
 			{
 				return pending;
 			}
-			// Dropped below the obstacle's roof level: either the final jump down or a fall. Both end at the start.
-			return here.getPlane() < pending.getPlane() ? startOfCourse(here) : null;
+			// Jumping down off the last obstacle: the start of the course is next, so show it already. A fall is
+			// handled separately (the fall message ends the obstacle).
+			RooftopCourse pendingCourse = RooftopCourse.forObstacle(pendingId);
+			boolean isLast = pendingCourse != null && pendingId == pendingCourse.lastObstacleId();
+			if (isLast && here.getPlane() < pending.getPlane())
+			{
+				return startOfCourse(here);
+			}
+			// Mid-obstacle the player can be on another level than the obstacle (Pollnivneach's gaps between roofs):
+			// keep showing it until the XP drop instead of letting it blink out
+			return pending;
 		}
 		if (pendingId != -1)
 		{
@@ -727,8 +751,9 @@ public class RooftopGuidePlugin extends Plugin
 		boolean leftCourse = false;
 		if (pending != null)
 		{
+			// walking off the course ends it; an obstacle that sits far from where it's used starts out far away
 			int distance = player.getWorldLocation().distanceTo(pending.getWorldLocation());
-			leftCourse = distance != Integer.MAX_VALUE && distance > config.maxDistance();
+			leftCourse = distance != Integer.MAX_VALUE && distance > config.maxDistance() + pendingStartDistance;
 		}
 
 		if (leftCourse || expired)
@@ -773,6 +798,14 @@ public class RooftopGuidePlugin extends Plugin
 	public void onMenuOptionClicked(MenuOptionClicked event)
 	{
 		MenuAction action = event.getMenuAction();
+
+		// with the interface covered, clicks on it (inventory, panels, orbs) do nothing, so a stray click can't hit them
+		if (isCoverOverInterface() && isInterfaceAction(action))
+		{
+			event.consume();
+			return;
+		}
+
 		boolean worldClick = recordClick(action);
 
 		// Any other click in the world (walking, or interacting with something else) interrupts the obstacle in
@@ -824,7 +857,12 @@ public class RooftopGuidePlugin extends Plugin
 		// the course is exempt, since after a fall the player may be a long way from it.
 		RooftopCourse clickedCourse = RooftopCourse.forObstacle(clicked.getId());
 		boolean isStart = clickedCourse != null && clicked.getId() == clickedCourse.firstObstacleId();
-		if (!isStart && !isNearPlayer(clicked))
+		// the obstacle that comes next is always fine to click, however far its object sits from the player: some
+		// (like Varrock's leap to the balcony) are placed well away from where you stand to use them
+		boolean isExpectedNext = clickedCourse != null && lastCompletedId != -1
+			&& RooftopCourse.forObstacle(lastCompletedId) == clickedCourse
+			&& clicked.getId() == nextAfter(clickedCourse, lastCompletedId);
+		if (!isStart && !isExpectedNext && !isNearPlayer(clicked))
 		{
 			interruptPending();
 			return;
@@ -843,6 +881,9 @@ public class RooftopGuidePlugin extends Plugin
 		pendingId = clicked.getId();
 		pendingWorld = clicked.getWorldLocation();
 		pendingTicks = 0;
+		Player clicker = client.getLocalPlayer();
+		int startDistance = clicker == null ? 0 : clicker.getWorldLocation().distanceTo(clicked.getWorldLocation());
+		pendingStartDistance = startDistance == Integer.MAX_VALUE ? 0 : startDistance;
 		pendingStartMillis = System.currentTimeMillis();
 		pendingKey = startKey(clicked.getId());
 		pendingInterrupted = false;
@@ -851,6 +892,21 @@ public class RooftopGuidePlugin extends Plugin
 		{
 			sessionStart = Instant.now();
 		}
+	}
+
+	/**
+	 * @return true for a click on an interface panel or an item in it, as opposed to a click in the game world. The
+	 * ITEM_* actions are deprecated in favour of CC_OP but are kept in case the client still sends them.
+	 */
+	@SuppressWarnings("deprecation")
+	private static boolean isInterfaceAction(MenuAction action)
+	{
+		return action == MenuAction.CC_OP
+			|| action == MenuAction.CC_OP_LOW_PRIORITY
+			|| action == MenuAction.WIDGET_TARGET
+			|| action == MenuAction.WIDGET_CONTINUE
+			|| action == MenuAction.ITEM_USE
+			|| isBetween(action, MenuAction.ITEM_FIRST_OPTION, MenuAction.ITEM_FIFTH_OPTION);
 	}
 
 	/** Identifies an obstacle plus the tile the player clicked it from, e.g. "15609@2670@3297@3". */

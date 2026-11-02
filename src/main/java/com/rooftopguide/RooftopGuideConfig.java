@@ -71,14 +71,14 @@ public interface RooftopGuideConfig extends Config
 	@ConfigItem(
 		keyName = "hideInterface",
 		name = "Hide interface",
-		description = "Also cover the game interface (inventory, chat, minimap). Off darkens only the game view "
-			+ "and keeps the interface visible",
+		description = "Also cover the game interface (inventory, chat, minimap), and ignore clicks on it so they can't be "
+			+ "hit by accident. Off darkens only the game view and leaves the interface visible and clickable",
 		section = focusSection,
 		position = 3
 	)
 	default boolean hideInterface()
 	{
-		return false;
+		return true;
 	}
 
 	@ConfigItem(

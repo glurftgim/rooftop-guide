@@ -6,7 +6,7 @@ import net.runelite.api.gameval.ObjectID;
 
 /**
  * Obstacle object IDs for each rooftop course, in route order. The IDs mirror the groups in RuneLite's own agility
- * plugin. Ardougne's order is confirmed in game; for the others it is a starting guess that the plugin corrects
+ * plugin. Ardougne's, Rellekka's, Pollnivneach's and Seers' Village's orders are confirmed in game; for the others it is a starting guess that the plugin corrects
  * itself when the real next obstacle differs (see RooftopGuidePlugin's learned successors).
  */
 enum RooftopCourse
