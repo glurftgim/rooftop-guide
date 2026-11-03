@@ -24,21 +24,7 @@ something else. It only draws on screen: it never clicks or moves for you.
 - [x] Rellekka
 - [x] Pollnivneach
 - [x] Seers' Village
-- [ ] Varrock (set up, but obstacle 6 is not fully verified in game yet)
-- [ ] Draynor (set up, not tested in game yet)
-- [ ] Al Kharid (set up, not tested in game yet)
-- [ ] Canifis (set up, not tested in game yet)
-- [ ] Falador (set up, not tested in game yet)
-
-Courses not tested yet start from RuneLite's own obstacle order and correct themselves after the real order has been
-seen twice.
-
-## How it picks the obstacle
-
-It follows the course's order. The next obstacle is the one after the one you just finished, which it detects from the
-agility XP drop that follows a click. When it doesn't know where you are in the course yet, it falls back to the nearest
-obstacle on your level. An obstacle clicked out of order isn't tracked and no lap is counted for it. Turn off the
-built-in Agility plugin's obstacle highlighting so the two don't overlap.
+- [ ] (other courses not tested)
 
 ## The timer bar
 
@@ -51,14 +37,6 @@ anywhere else interrupts it: the bar disappears and that run isn't learned from.
 for the tile you clicked it from (the course is the same tiles every lap), keeps the middle of your last five runs, and
 remembers them between sessions, so the bar is empty only for an obstacle you haven't finished yet. The "Warn early"
 setting changes its color a little before the usual end.
-
-## Marks of grace
-
-![Marks of grace in four frames: a pulsing glow on the tile, a light beam rising from it and the mark's icon bobbing on top](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/mark-steps.jpg)
-
-[Watch the glow and beam as an animation (GIF)](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/mark-of-grace.gif)
-
-A mark of grace lying on a roof gets a pulsing glow on its tile, a light beam rising from it, and its icon floating on top. By default a mark is only shown this way when you can walk to it from where you stand, so a mark on another roof stays hidden until it can be picked up. Separately, the count under the timer bar (x2, x3...) includes every mark lying nearby, on any roof.
 
 ## Transparent mode
 
@@ -87,12 +65,3 @@ own click cross is drawn over the dark cover.
 - **Session:** the session box on or off.
 - **Transparent mode:** hotkey, darkness, window opacity, hide interface, show interface after a
   Seers' lap.
-
-## Jagex rules
-
-This plugin only draws overlays and changes how the window looks. It does not click, move or press keys for you, add or
-change menu entries, move or resize click zones, unhide interface parts, or show anything about boss mechanics, other
-players or loot. The one thing that touches input is the interface click block in transparent mode: while the interface
-is covered it ignores clicks on interface panels. It sends nothing to the server and never changes anything in the game
-world. As I read Jagex's third-party client guidelines, none of their listed prohibitions apply, but the list says it
-isn't exhaustive, so the final call is Jagex's and the Plugin Hub reviewers'.
