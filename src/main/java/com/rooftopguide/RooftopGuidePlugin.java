@@ -295,7 +295,7 @@ public class RooftopGuidePlugin extends Plugin
 	public void onConfigChanged(ConfigChanged event)
 	{
 		// turning the timer bar sideways swaps its width and height, and RuneLite remembers the new size
-		if (RooftopGuideConfig.GROUP.equals(event.getGroup()) && "timerVertical".equals(event.getKey()))
+		if (RooftopGuideConfig.GROUP.equals(event.getGroup()) && "timerDirection".equals(event.getKey()))
 		{
 			timerOverlay.flipSize();
 			overlayManager.saveOverlay(timerOverlay);

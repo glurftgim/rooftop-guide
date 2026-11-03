@@ -171,16 +171,36 @@ public interface RooftopGuideConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "timerVertical",
-		name = "Vertical bar",
-		description = "Fill the timer bar upward, like a thermometer, instead of to the right. Switching this swaps the "
-			+ "bar's width and height, so a bar you have resized turns with it",
+		keyName = "timerDirection",
+		name = "Bar direction",
+		description = "Horizontal fills the timer bar to the right. Vertical fills it upward, like a thermometer. "
+			+ "Switching swaps the bar's width and height, so a bar you have resized turns with it",
 		section = timerSection,
 		position = 2
 	)
-	default boolean timerVertical()
+	default TimerDirection timerDirection()
 	{
-		return false;
+		return TimerDirection.HORIZONTAL;
+	}
+
+	/** Which way the timer bar fills. */
+	enum TimerDirection
+	{
+		HORIZONTAL("Horizontal"),
+		VERTICAL("Vertical");
+
+		private final String label;
+
+		TimerDirection(String label)
+		{
+			this.label = label;
+		}
+
+		@Override
+		public String toString()
+		{
+			return label;
+		}
 	}
 
 	@Range(min = 0, max = 100)

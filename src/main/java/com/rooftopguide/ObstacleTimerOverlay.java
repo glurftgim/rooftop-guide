@@ -71,7 +71,7 @@ class ObstacleTimerOverlay extends Overlay
 			return null;
 		}
 		Dimension size = getPreferredSize() != null ? getPreferredSize()
-			: config.timerVertical() ? DEFAULT_SIZE_VERTICAL : DEFAULT_SIZE;
+			: config.timerDirection() == RooftopGuideConfig.TimerDirection.VERTICAL ? DEFAULT_SIZE_VERTICAL : DEFAULT_SIZE;
 		// in transparent mode the FocusOverlay draws this above the cover, at this overlay's current spot; returning
 		// the size either way keeps the bounds current so it can still be dragged
 		if (!plugin.isFocusMode())
@@ -145,7 +145,7 @@ class ObstacleTimerOverlay extends Overlay
 	/** Draws the bar in the size given, filling to the right, or upward if the bar is set to be vertical. */
 	private void drawBar(Graphics2D graphics, Dimension size, boolean placeholder)
 	{
-		if (!config.timerVertical())
+		if (config.timerDirection() != RooftopGuideConfig.TimerDirection.VERTICAL)
 		{
 			drawBarAcross(graphics, size, placeholder);
 			return;
