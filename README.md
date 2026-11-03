@@ -4,7 +4,7 @@ Shows you the next obstacle on rooftop agility courses, with a crossing timer, m
 box. A transparent mode darkens the game and lets a video show through, so rooftops can be run AFK while you watch
 something else. It only draws on screen: it never clicks or moves for you.
 
-![Rooftop Guide on the Ardougne course, with numbered markers for the timer bar (1), the mark of grace count (2) and the session box (3), and a legend of the highlight colors](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/main.jpg)
+![Rooftop Guide on the Ardougne course, with numbered markers for the timer bar (1), the mark of grace count (2), the session box (3), the obstacle in progress (4) and the upcoming obstacle (5), and a legend of the highlight colors](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/main.jpg)
 
 ## Features
 
@@ -42,7 +42,9 @@ built-in Agility plugin's obstacle highlighting so the two don't overlap.
 
 ## The timer bar
 
-![The timer bar filling toward your usual time for the obstacle, then jumping to full and green when the XP drop arrives](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/timer-bar.gif)
+![The timer bar in four steps: it starts to fill when you click, fills toward your usual time, and turns full and green when the XP drop says you can move on](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/timer-steps.jpg)
+
+[Watch the timer bar as an animation (GIF)](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/timer-bar.gif)
 
 The bar starts on your first click on an obstacle and ends on the XP drop. Spam-clicking doesn't restart it. Clicking
 anywhere else interrupts it: the bar disappears and that run isn't learned from. It learns a time for each obstacle and
@@ -50,9 +52,17 @@ for the tile you clicked it from (the course is the same tiles every lap), keeps
 remembers them between sessions, so the bar is empty only for an obstacle you haven't finished yet. The "Warn early"
 setting changes its color a little before the usual end.
 
+## Marks of grace
+
+![Marks of grace in four frames: a pulsing glow on the tile, a light beam rising from it and the mark's icon bobbing on top](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/mark-steps.jpg)
+
+[Watch the glow and beam as an animation (GIF)](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/mark-of-grace.gif)
+
+A mark of grace lying on a roof gets a pulsing glow on its tile, a light beam rising from it, and its icon floating on top. By default a mark is only shown this way when you can walk to it from where you stand, so a mark on another roof stays hidden until it can be picked up. Separately, the count under the timer bar (x2, x3...) includes every mark lying nearby, on any roof.
+
 ## Transparent mode
 
-![Transparent mode over a video: the game is dark and see-through, and only the timer bar and highlights show](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/transparent.jpg)
+![Transparent mode over a video, with labels on the timer bar, the mark of grace count and the obstacle highlight, and a short explanation of what the mode does](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/transparent.jpg)
 
 Set a hotkey for it in the plugin's settings (there is none by default). It darkens the game so only the highlights,
 timer bar and mark of grace icons show, and lowers the window's opacity so a video behind it shows through. The game's
