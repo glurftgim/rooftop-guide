@@ -11,9 +11,9 @@ class FocusOverlay extends FocusCover
 	@Inject
 	private FocusOverlay(Client client, RooftopGuidePlugin plugin, RooftopGuideConfig config,
 		SpriteManager spriteManager, RooftopGuideOverlay obstacleOverlay, MarkOverlay markOverlay,
-		ObstacleTimerOverlay timerOverlay)
+		ObstacleTimerOverlay timerOverlay, PredictedObstacleOverlay predictedOverlay)
 	{
-		super(client, plugin, config, spriteManager, obstacleOverlay, markOverlay, timerOverlay,
+		super(client, plugin, config, spriteManager, obstacleOverlay, markOverlay, timerOverlay, predictedOverlay,
 			OverlayLayer.ALWAYS_ON_TOP);
 	}
 

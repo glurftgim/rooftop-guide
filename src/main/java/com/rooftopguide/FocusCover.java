@@ -30,10 +30,11 @@ abstract class FocusCover extends Overlay
 	private final RooftopGuideOverlay obstacleOverlay;
 	private final MarkOverlay markOverlay;
 	private final ObstacleTimerOverlay timerOverlay;
+	private final PredictedObstacleOverlay predictedOverlay;
 
 	FocusCover(Client client, RooftopGuidePlugin plugin, RooftopGuideConfig config, SpriteManager spriteManager,
 		RooftopGuideOverlay obstacleOverlay, MarkOverlay markOverlay, ObstacleTimerOverlay timerOverlay,
-		OverlayLayer layer)
+		PredictedObstacleOverlay predictedOverlay, OverlayLayer layer)
 	{
 		this.client = client;
 		this.plugin = plugin;
@@ -42,6 +43,7 @@ abstract class FocusCover extends Overlay
 		this.obstacleOverlay = obstacleOverlay;
 		this.markOverlay = markOverlay;
 		this.timerOverlay = timerOverlay;
+		this.predictedOverlay = predictedOverlay;
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(layer);
 	}
@@ -64,6 +66,7 @@ abstract class FocusCover extends Overlay
 		markOverlay.renderHighlights(graphics);
 		obstacleOverlay.renderHighlights(graphics);
 		timerOverlay.renderOnCover(graphics);
+		predictedOverlay.renderGhost(graphics);
 		drawClickCross(graphics);
 		return null;
 	}

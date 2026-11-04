@@ -117,6 +117,9 @@ public class RooftopGuidePlugin extends Plugin
 	private ObstacleTimerOverlay timerOverlay;
 
 	@Inject
+	private PredictedObstacleOverlay predictedOverlay;
+
+	@Inject
 	private KeyManager keyManager;
 
 	/** Focus mode hides the game and shows only the highlights. Toggled by the hotkey. */
@@ -219,6 +222,7 @@ public class RooftopGuidePlugin extends Plugin
 		overlayManager.add(markOverlay);
 		overlayManager.add(sessionOverlay);
 		overlayManager.add(timerOverlay);
+		overlayManager.add(predictedOverlay);
 		overlayManager.add(focusOverlay);
 		overlayManager.add(focusUnderlay);
 		loadLearnedDurations();
@@ -233,6 +237,7 @@ public class RooftopGuidePlugin extends Plugin
 		overlayManager.remove(markOverlay);
 		overlayManager.remove(sessionOverlay);
 		overlayManager.remove(timerOverlay);
+		overlayManager.remove(predictedOverlay);
 		overlayManager.remove(focusOverlay);
 		overlayManager.remove(focusUnderlay);
 		keyManager.unregisterKeyListener(hotkeyListener);
@@ -400,6 +405,19 @@ public class RooftopGuidePlugin extends Plugin
 
 		int nextId = nextAfter(course, pendingId);
 		return nearest(here, obstacle -> obstacle.getId() == nextId, ORDERED_SEARCH_RADIUS);
+	}
+
+	/** @return the obstacles currently loaded, for the predicted obstacle overlay to look the next one up in */
+	Set<TileObject> getObstacles()
+	{
+		return obstacles;
+	}
+
+	/** @return the ID of the obstacle that follows the one being crossed, or -1 if none is being crossed */
+	int getFollowingObstacleId()
+	{
+		RooftopCourse course = pendingId == -1 ? null : RooftopCourse.forObstacle(pendingId);
+		return course == null ? -1 : nextAfter(course, pendingId);
 	}
 
 	Map<TileItem, Tile> getMarks()

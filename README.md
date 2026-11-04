@@ -15,6 +15,8 @@ something else. It only draws on screen: it never clicks or moves for you.
   timer bar (x2, x3...) for any marks lying nearby, on any roof.
 - A session box with time, laps, XP, marks of grace and falls, with per-hour rates.
 - Falls are noticed: the timer stops, no lap is counted, and the highlight goes back to the start of the course.
+- Predictable Obstacle Mode (optional): while you cross an obstacle, a ghost of the next one shows where it will appear
+  on screen once you land, so the mouse can already be there. You choose its color and opacity.
 - Transparent mode for watching something while you play (see below).
 - Hold Alt to drag the timer bar and the session box; drag the timer bar's edges to resize it, down to very thin.
 
@@ -38,6 +40,20 @@ for the tile you clicked it from (the course is the same tiles every lap), keeps
 remembers them between sessions, so the bar is empty only for an obstacle you haven't finished yet. The "Warn early"
 setting changes its color a little before the usual end.
 
+## Predictable Obstacle Mode
+
+An optional mode, off by default. While you cross an obstacle, it draws a ghost of the **next** obstacle where it will
+appear on screen once you land, so you can put the mouse there before the jump ends. In the settings you can choose the
+ghost's color and how solid its fill is.
+
+It works because the game camera follows your character. The plugin knows the tile each obstacle lands you on, and
+shows the next obstacle as the camera will see it from there. A few things to know:
+
+- It measures the camera while you stand still, so it can be slightly off right after you change the zoom or the camera
+  angle, until you have stood still for a moment.
+- The next obstacle has to be loaded and on screen. If it isn't, no ghost is shown and the normal highlights carry on.
+- If you click away in the middle of an obstacle, the ghost disappears, since the obstacle may not finish.
+
 ## Transparent mode
 
 ![Transparent mode over a video, with labels on the timer bar, the mark of grace count and the obstacle highlight, and a short explanation of what the mode does](https://raw.githubusercontent.com/glurftgim/rooftop-guide/main/screenshots/transparent.jpg)
@@ -60,8 +76,16 @@ own click cross is drawn over the dark cover.
 
 - **Obstacles:** colors for next, in progress and upcoming; show the in-progress and upcoming highlights; label; max
   distance.
+- **Predictable obstacle:** the mode on or off, the ghost's color, the ghost's opacity.
 - **Timer bar:** on or off, direction (horizontal or vertical, horizontal by default), background opacity, how early it warns.
 - **Marks of grace:** highlight on or off, the count under the timer bar, color.
 - **Session:** the session box on or off.
 - **Transparent mode:** hotkey, darkness, window opacity, hide interface, show interface after a
   Seers' lap.
+
+## Credits
+
+Predictable Obstacle Mode uses the camera method and the obstacle landing tiles from
+[rooftop-obstacle-preview](https://github.com/burkeg/rooftop-obstacle-preview) by burkeg, and the same idea is in
+[Simple Ardougne Rooftop](https://github.com/Humperd7nck/ardougne-next-obstacle) by Humperd7nck. See
+THIRD_PARTY_NOTICES.md.

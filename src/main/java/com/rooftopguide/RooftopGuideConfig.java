@@ -17,16 +17,19 @@ public interface RooftopGuideConfig extends Config
 	@ConfigSection(name = "Obstacles", description = "How obstacles are highlighted", position = 1)
 	String obstacleSection = "obstacles";
 
-	@ConfigSection(name = "Timer bar", description = "The crossing timer bar. Hold Alt and drag it to move it", position = 2)
+	@ConfigSection(name = "Predictable obstacle", description = "Shows where the next obstacle will be on screen once you land, so the mouse can be there first", position = 2)
+	String predictableSection = "predictable";
+
+	@ConfigSection(name = "Timer bar", description = "The crossing timer bar. Hold Alt and drag it to move it", position = 3)
 	String timerSection = "timer";
 
-	@ConfigSection(name = "Marks of grace", description = "Marks of grace highlight", position = 3)
+	@ConfigSection(name = "Marks of grace", description = "Marks of grace highlight", position = 4)
 	String marksSection = "marks";
 
-	@ConfigSection(name = "Session", description = "Laps and rate overlay", position = 4)
+	@ConfigSection(name = "Session", description = "Laps and rate overlay", position = 5)
 	String sessionSection = "session";
 
-	@ConfigSection(name = "Transparent mode", description = "Hide the game and make the window see-through, leaving only the highlights", position = 5)
+	@ConfigSection(name = "Transparent mode", description = "Hide the game and make the window see-through, leaving only the highlights", position = 6)
 	String focusSection = "focus";
 
 	@ConfigItem(
@@ -253,6 +256,45 @@ public interface RooftopGuideConfig extends Config
 	default int maxDistance()
 	{
 		return 15;
+	}
+
+	@ConfigItem(
+		keyName = "predictableMode",
+		name = "Predictable Obstacle Mode",
+		description = "While you cross an obstacle, show a ghost of the next obstacle where it will appear on screen "
+			+ "once you land, so you can put the mouse there before the jump ends. It needs the next obstacle to be "
+			+ "loaded and on screen, and the ghost can be a little off until the camera has been still for a moment",
+		section = predictableSection,
+		position = 1
+	)
+	default boolean predictableMode()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "predictableColor",
+		name = "Ghost color",
+		description = "Color of the predicted obstacle",
+		section = predictableSection,
+		position = 2
+	)
+	default Color predictableColor()
+	{
+		return new Color(255, 0, 200);
+	}
+
+	@Range(min = 0, max = 100)
+	@ConfigItem(
+		keyName = "predictableOpacity",
+		name = "Ghost opacity",
+		description = "How solid the ghost's fill is, in percent. 0 shows only its outline",
+		section = predictableSection,
+		position = 3
+	)
+	default int predictableOpacity()
+	{
+		return 35;
 	}
 
 	@ConfigItem(
